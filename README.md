@@ -56,3 +56,35 @@ class Block {
 当然，我们的创世区块是硬编码的，记得把它也给更新成相应的结构哦。
 
 ### 挖矿
+
+如上所述， 为了解开我们的工作量证明拼图这个任务，我们需要不停的修改区块中的nonce然后计算修改后的哈希，直到算出满足条件的哈希。这个满足条件的哈希什么时候才会跑出来则完全是个随机的事情。所以我们要做的就是给nonce一个初始值，然后不停的循环，修改，计算哈希，直到满足条件的心仪的它的出现。
+
+``` typescript
+const findBlock = (index: number, previousHash: string, timestamp: number, data: string, difficulty: number): Block => {
+    let nonce = 0;
+    while (true) {
+        const hash: string = calculateHash(index, previousHash, timestamp, data, difficulty, nonce);
+        if (hashMatchesDifficulty(hash, difficulty)) {
+            return new Block(index, hash, previousHash, timestamp, data, difficulty, nonce);
+        }
+        nonce++;
+    }
+};
+```
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
