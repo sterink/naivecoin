@@ -295,6 +295,12 @@ const validateCoinbaseTx = (transaction: Transaction, blockIndex: number): boole
 };
 ```
 
+### 小结
+
+这个章节中我们将交易引入到我们的区块链中来。基本思路是很简单的：我们通过在交易数据结构中的inputs中指定「未消费outputs」来作为交易来源，并通过对交易id进行签名来保证有权解锁该未消费outputs，然后通过outputs中的接收者 (们)的地址来将该未消费outputs重新分配给指定的接收者(们)，最终交易完成。
+
+但是，到现在为止，去创建一笔交易还是相当的麻烦的。我们必须手动去创建交易的inputs和outputs，然后用我们的私钥去对交易进行加密签名。在我们下一章节中，我们将引入钱包机制，这些麻烦将会被一一击破。
+
 
 
 
