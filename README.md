@@ -125,7 +125,24 @@ const getAdjustedDifficulty = (latestBlock: Block, aBlockchain: Block[]) => {
 };
 ```
 
+### 时间戳校验
 
+第一章节中的区块链版本中，区块结构中的时间戳属性是没有任何意义的，因为我们不会对其作任何校验的工作，也就是说，我们其实可以给该时间戳赋以任何内容。 但现在情况变了，因为我们这里引入了难易度的动态调整，而该调整是基于前10个区块产出的耗时总长度的。所以时间戳我们就不能像之前一样随意赋值了。
+
+既然时间戳的大小会影响区块产出难易度的调整，所以有怀心思的人就会考虑去恶意设置一个错误的时间戳来尝试操纵我们的难易度，以实现对我们的区块链网络进行攻击。为了规避这种风险，我们需要引入以下的规则:
+
+- 新区块时间戳比当前时间最晚不晚过1分钟，那么我们认为该区块有效。
+- 新区块时间戳比前一区块的时间戳最早不早过1分钟，那么我们任务该区块在区块链中是有效的。
+
+
+``` typescript
+const isValidTimestamp = (newBlock: Block, previousBlock: Block): boolean => {
+    return ( newBlock.timestamp - 60 < getCurrentTimestamp() )
+        && ( previousBlock.timestamp - 60 < newBlock.timestamp );
+};
+```
+
+> 天地会珠海分舵注：这里为什么要有一分钟的缓冲呢？估计是为了既考虑一定程度的容错，也减缓了时间戳恶意修改的攻击。如果还有其他原因的，请执教: zhubaitian@163.com
 
 
 
