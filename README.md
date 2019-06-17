@@ -1,26 +1,4 @@
-# Naivecoin: chapter 3
-The branch for Naivecoin, chapter3
+# 交易
+### 概览
+本章我们将引入加密货币中的**交易**这个概念。有了交易这个机制之后，我们的区块链将会从一个基本区块链华丽翻身成一个加密货币系统。 最终我们就能通过指定目标用户的地址，和对应的用户进行加密货币交易。 当然，交易之前你必须能证明你是该货币的持有者。
 
-```
-npm install
-npm start
-```
-
-##### Get blockchain
-```
-curl http://localhost:3001/blocks
-```
-
-##### Mine the first block with only a coinbase transaction
-```
-curl -H "Content-type:application/json" --data '{"data" : [{"txIns":[{"signature":"","txOutId":"","txOutIndex":1}],"txOuts":[{"address":"04bfcab8722991ae774db48f934ca79cfb7dd991229153b9f732ba5334aafcd8e7266e47076996b55a14bf9913ee3145ce0cfc1372ada8ada74bd287450313534a","amount":50}],"id":"f089e8113094fab66b511402ecce021d0c1f664a719b5df1652a24d532b2f749"}]}' http://localhost:3001/mineBlock
-``` 
-
-##### Add peer
-```
-curl -H "Content-type:application/json" --data '{"peer" : "ws://localhost:6001"}' http://localhost:3001/addPeer
-```
-#### Query connected peers
-```
-curl http://localhost:3001/peers
-```
