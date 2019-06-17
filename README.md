@@ -85,10 +85,45 @@ const findBlock = (index: number, previousHash: string, timestamp: number, data:
 - **BLOCK_GENERATION_INTERVAL**： 定义 一个区块产出的 频率(比特币中该值是设置成10分钟的， 即每10分钟产出一个区块)
 - **DIFFICULTY_ADJUSTMENT_INTERVAL**: 定义 修改难易度以适应网络不断增加或者降低的网络算力的 频率(比特币中是设置成2016个区块， 即每2016个区块，然后根据这些区块生成的耗时，做一次难易度调整)
 
+这里我们将会把区块产出间隔设置成10秒，难易度调整间隔设置成10个区块。这些常量是不会随着时间而改变的，所以我们将其硬编码如下：
 
+``` typescript
+// in seconds
+const BLOCK_GENERATION_INTERVAL: number = 10;
 
+// in blocks
+const DIFFICULTY_ADJUSTMENT_INTERVAL: number = 10;
+```
 
+有了这些规则，我们就可以在我们的网络上达成难易度的一致性了。每产出10个区块之后，我们就去检查生成所有这10个区块所消耗的时间，然后和**预期时间**进行对比，然后对难易度进行动态的调整。
 
+这里的**预期时间**是这样指定的：BLOCK_GENERATION_INTERVAL * DIFFICULTY_ADJUSTMENT_INTERVAL。 该预期时间代表了当前网络的算力刚刚好和当前的难易度吻合。
+
+如果耗时超过或者不足**预期时间**的两倍，那么我们就会将difficulty进行对应的减1或者加1。该算法如下：
+
+``` typescript
+const getDifficulty = (aBlockchain: Block[]): number => {
+    const latestBlock: Block = aBlockchain[blockchain.length - 1];
+    if (latestBlock.index % DIFFICULTY_ADJUSTMENT_INTERVAL === 0 && latestBlock.index !== 0) {
+        return getAdjustedDifficulty(latestBlock, aBlockchain);
+    } else {
+        return latestBlock.difficulty;
+    }
+};
+
+const getAdjustedDifficulty = (latestBlock: Block, aBlockchain: Block[]) => {
+    const prevAdjustmentBlock: Block = aBlockchain[blockchain.length - DIFFICULTY_ADJUSTMENT_INTERVAL];
+    const timeExpected: number = BLOCK_GENERATION_INTERVAL * DIFFICULTY_ADJUSTMENT_INTERVAL;
+    const timeTaken: number = latestBlock.timestamp - prevAdjustmentBlock.timestamp;
+    if (timeTaken < timeExpected / 2) {
+        return prevAdjustmentBlock.difficulty + 1;
+    } else if (timeTaken > timeExpected * 2) {
+        return prevAdjustmentBlock.difficulty - 1;
+    } else {
+        return prevAdjustmentBlock.difficulty;
+    }
+};
+```
 
 
 
