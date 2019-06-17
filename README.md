@@ -25,3 +25,34 @@ const hashMatchesDifficulty = (hash: string, difficulty: number): boolean => {
     return hashInBinary.startsWith(requiredPrefix);
 };
 ```
+
+区块的哈希是通过对区块的内容算sha256来获得的，通过相同的区块内容做哈希，我们是无法算出出符合指定difficulty的哈希， 因为内容一直没有边，哈希也就一直不变， 这就是为什么我们引入了nonce这个属性到区块中，我们可以控制nonce的改变来获得不同的哈希值。只要我们的内容有任何一点点的改变，算出来的哈希就肯定是不一样的。一旦相应的nonce修改后让我们获得到指定difficulty的哈希，我们挖矿也就成功了！
+
+既然现在我们加入了difficulty和nonce到区块中，我们还是先看看区块结构现在长什么样吧：
+
+``` typescript
+class Block {
+
+    public index: number;
+    public hash: string;
+    public previousHash: string;
+    public timestamp: number;
+    public data: string;
+    public difficulty: number;
+    public nonce: number;
+
+    constructor(index: number, hash: string, previousHash: string,
+                timestamp: number, data: string, difficulty: number, nonce: number) {
+        this.index = index;
+        this.previousHash = previousHash;
+        this.timestamp = timestamp;
+        this.data = data;
+        this.hash = hash;
+        this.difficulty = difficulty;
+        this.nonce = nonce;
+    }
+}
+```
+当然，我们的创世区块是硬编码的，记得把它也给更新成相应的结构哦。
+
+### 挖矿
