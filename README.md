@@ -45,7 +45,24 @@ const getPublicFromWallet = (): string => {
 };
 ```
 
+需要提一提的是，把私钥明文保存在文件中是一个非常不安全的做法。我们这样子做只是为了演示的简单起见而已。同时，一个钱包当前只支持一个私钥，所以，如果你需要一个新的公钥来作为地址的话，必须要创建一个新的钱包。
 
+### 钱包余额
+
+复习以下上一章节提到的一个说法：你在区块链中拥有的加密货币， 指的其实就是在「未消费交易outputs」中，接收者地址为自己的公钥的一系列outputs。
+
+这意味着，我们如果要查看钱包余额的话，事情就变得非常简单了：你只需要将该地址下的所有「未消费交易output」记录的货币数加起来就完了。
+
+``` typescript
+const getBalance = (address: string, unspentTxOuts: UnspentTxOut[]): number => {
+    return _(unspentTxOuts)
+        .filter((uTxO: UnspentTxOut) => uTxO.address === address)
+        .map((uTxO: UnspentTxOut) => uTxO.amount)
+        .sum();
+};
+```
+
+为了让演示更简单，我们在查询一个钱包地址的余额时并不需要提供任何私钥信息。也就是说，任何人都可以查看别人的账户余额。
 
 
 
