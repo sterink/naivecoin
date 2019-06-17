@@ -1,6 +1,6 @@
 # Naivecoin
 
-The repository for the naivecoin tutorial: https://lhartikk.github.io/
+通过1500行代码演示如何实现区块链和比特币，英文原版教程: https://lhartikk.github.io/
 
 ```
 npm install
