@@ -153,14 +153,41 @@ class UnspentTxOut {
 let unspentTxOuts: UnspentTxOut[] = [];
 ```
 
+### 未消费交易outputs更新
+每当一个新的区块加入到区块链中，我们都必须对我们的未消费outputs进行更新。 因为新的区块将可能会消费掉未消费outputs中的一些outputs，并肯定会引入新的outputs。
+
+为了对此进行处理，我们需要加新区块加入时，将区块中的未消费交易outputs给解析出来：
+
+``` typescript
+ const newUnspentTxOuts: UnspentTxOut[] = newTransactions
+        .map((t) => {
+            return t.txOuts.map((txOut, index) => new UnspentTxOut(t.id, index, txOut.address, txOut.amount));
+        })
+        .reduce((a, b) => a.concat(b), []);
+```
+
+同时，我们还要找出这个新增区块将会消耗掉哪些交易outputs。我们通过检验交易数据的inputs下的项，即可以将这些数据找出来:
+
+``` typescript
+const consumedTxOuts: UnspentTxOut[] = newTransactions
+        .map((t) => t.txIns)
+        .reduce((a, b) => a.concat(b), [])
+        .map((txIn) => new UnspentTxOut(txIn.txOutId, txIn.txOutIndex, '', 0));
+
+```
+
+最终我们通过删除已经消费的并且加上新的未消费的，从而产生了新的未消费交易outputs，具体代码如下：
+
+``` typescript
+const resultingUnspentTxOuts = aUnspentTxOuts
+        .filter(((uTxO) => !findUnspentTxOut(uTxO.txOutId, uTxO.txOutIndex, consumedTxOuts)))
+        .concat(newUnspentTxOuts);
+```
+
+以上代码片段都是在updateUnspentTxOuts这个方法中实现的。 需要注意的是，这个方法只有在区块含有的交易数据(以及这个块本身)都被验证没有问题的时候才会被调用。
 
 
-
-
-
-
-
-
+### 交易有效性验证
 
 
 
