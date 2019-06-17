@@ -142,7 +142,7 @@ const isValidTimestamp = (newBlock: Block, previousBlock: Block): boolean => {
 };
 ```
 
-> 天地会珠海分舵注：这里为什么要有一分钟的缓冲呢？估计是为了既考虑一定程度的容错，也减缓了时间戳恶意修改的攻击。如果还有其他原因的，请执教: zhubaitian@163.com
+> 天地会珠海分舵注：这里为什么要有一分钟的缓冲呢？估计是为了既考虑一定程度的容错，也减缓了时间戳恶意修改的攻击。如果还有其他原因的，请指教: zhubaitian@163.com
 
 
 
