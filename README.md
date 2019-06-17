@@ -252,6 +252,19 @@ npm install
 npm start
 ```
 
+## 运行
+打开一个终端运行节点1. 节点1的http服务端端口为3001， p2p端口为6001。
+``` shell
+npm run node1
+```
+建议打开另外一个终端运行节点2，以便能通过输出查看两个区块链节点是怎么通信的。 节点1的http服务端端口为3002， p2p端口为6002。
+
+``` shell
+npm run node2
+```
+
+> ps： 节点2运行后，即可以通过addPeer这个api和节点1进行websocket连接。
+
 ## 获取区块链
 ```
 curl http://localhost:3001/blocks
