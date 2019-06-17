@@ -249,7 +249,6 @@ const replaceChain = (newBlocks: Block[]) => {
 ## 安装
 ```
 npm install
-npm start
 ```
 
 ## 运行
