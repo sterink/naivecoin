@@ -153,8 +153,8 @@ class UnspentTxOut {
 let unspentTxOuts: UnspentTxOut[] = [];
 ```
 
-### 未消费交易outputs更新
-每当一个新的区块加入到区块链中，我们都必须对我们的未消费outputs进行更新。 因为新的区块将可能会消费掉未消费outputs中的一些outputs，并肯定会引入新的outputs。
+### 「未消费交易outputs」更新
+每当一个新的区块加入到区块链中，我们都必须对我们的未消费outputs进行更新。 因为新的区块将可能会消费掉「未消费outputs」中的一些outputs，并肯定会引入新的outputs。
 
 为了对此进行处理，我们需要加新区块加入时，将区块中的未消费交易outputs给解析出来：
 
@@ -188,6 +188,123 @@ const resultingUnspentTxOuts = aUnspentTxOuts
 
 
 ### 交易有效性验证
+
+现在我们可以制定一些规则来检查交易是否有效：
+
+- 交易数据结构有效性验证
+对数据结构的类型等进行验证:
+
+``` typescript
+const isValidTransactionStructure = (transaction: Transaction) => {
+        if (typeof transaction.id !== 'string') {
+            console.log('transactionId missing');
+            return false;
+        }
+        ...
+       //check also the other members of class
+    }
+```
+
+- 交易id有效性验证
+
+``` typescript
+if (getTransactionId(transaction) !== transaction.id) {
+        console.log('invalid tx id: ' + transaction.id);
+        return false;
+    }
+```
+
+- inputs有效性验证
+
+交易数据结构中的inputs中的签名必须有效，且指向的交易来源outputs必须还没有被消费掉。
+
+``` typescript
+const validateTxIn = (txIn: TxIn, transaction: Transaction, aUnspentTxOuts: UnspentTxOut[]): boolean => {
+    const referencedUTxOut: UnspentTxOut =
+        aUnspentTxOuts.find((uTxO) => uTxO.txOutId === txIn.txOutId && uTxO.txOutId === txIn.txOutId);
+    if (referencedUTxOut == null) {
+        console.log('referenced txOut not found: ' + JSON.stringify(txIn));
+        return false;
+    }
+    const address = referencedUTxOut.address;
+
+    const key = ec.keyFromPublic(address, 'hex');
+    return key.verify(transaction.id, txIn.signature);
+};
+```
+
+- outputs有效性验证
+交易数据结构中outputs所指定的交易总额之和，必须与inputs中指向的交易来源的outputs总额之和一致。比如，指向的交易来源output有50个币，然后你需要给别人发送30个币，最终outputs中将会有两条记录，一条是发送30个币给对方，另外一条是发送20个币给自己，总共加起来就是50个币(当然，最终在未消费交易outputs中，交易来源的这条output将会被删除掉，而新的两个outputs将会被加进去)。
+
+``` typescript
+const totalTxInValues: number = transaction.txIns
+        .map((txIn) => getTxInAmount(txIn, aUnspentTxOuts))
+        .reduce((a, b) => (a + b), 0);
+
+    const totalTxOutValues: number = transaction.txOuts
+        .map((txOut) => txOut.amount)
+        .reduce((a, b) => (a + b), 0);
+
+    if (totalTxOutValues !== totalTxInValues) {
+        console.log('totalTxOutValues !== totalTxInValues in tx: ' + transaction.id);
+        return false;
+    }
+```
+
+### 原始交易
+
+如前面谈及的，交易的inputs所指向的交易来源总是来自「未消费交易outputs」中的加密货币， 但是，最原始的一条交易记录的inputs将会没地方指向。因为这时候还根本没有任何未消费交易outputs。为了解决这个问题，我们需要引入一个特殊的交易类型：「原始交易」
+
+原始交易的数据结构中只会有一个output，且input不会指向任何交易来源。也就是说这种交易只是为了增加新币进行流通用的，并不是一个用户和另外一个用户进行的交易。每一次挖矿成功，都会产生一个原始交易。
+
+我们对原始交易中产生的货币量定义为50个币：
+
+``` typescript
+const COINBASE_AMOUNT: number = 50;
+```
+
+每个区块的第一个交易记录都是原始交易，且该第一个交易中的output中指向的接收者地址都是挖出该区块的矿工的公钥。所以，原始交易可以堪称是对挖矿的一种激励机制：一旦你挖出了一个区块，你就会获得50个币的激励。
+
+同时，我们会将区块的高度信息(可以理解为区块的序号)加入到原始交易的input当中，这样做的目的是为了保证每笔原始交易id都是不一样的。因为交易id是通过对交易的内容做哈希算出来的，多条‘给地址0x5cc发放50个币‘记录将不至于会生成同一个交易id。
+
+对原始交易的有效性验证将会和对普通交易的有效性验证有所不同:
+
+``` typescript
+const validateCoinbaseTx = (transaction: Transaction, blockIndex: number): boolean => {
+    if (getTransactionId(transaction) !== transaction.id) {
+        console.log('invalid coinbase tx id: ' + transaction.id);
+        return false;
+    }
+    if (transaction.txIns.length !== 1) {
+        console.log('one txIn must be specified in the coinbase transaction');
+        return;
+    }
+    if (transaction.txIns[0].txOutIndex !== blockIndex) {
+        console.log('the txIn index in coinbase tx must be the block height');
+        return false;
+    }
+    if (transaction.txOuts.length !== 1) {
+        console.log('invalid number of txOuts in coinbase transaction');
+        return false;
+    }
+    if (transaction.txOuts[0].amount != COINBASE_AMOUNT) {
+        console.log('invalid coinbase amount in coinbase transaction');
+        return false;
+    }
+    return true;
+};
+```
+
+
+
+
+
+
+
+
+
+
+
 
 
 
