@@ -4,6 +4,8 @@
   "description": "",
   "scripts": {
     "prestart": "npm run compile",
+    "node1": "HTTP_PORT=3001 P2P_PORT=6001 npm start ",
+    "node2": "HTTP_PORT=3002 P2P_PORT=6002 PRIVATE_KEY=node/wallet/private_key2 PEER=ws://localhost:6001 npm start ",
     "start": "node src/main.js",
     "compile": "tsc"
   },

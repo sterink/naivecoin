@@ -3,7 +3,7 @@ import * as express from 'express';
 
 import {
     Block, generateNextBlock, generatenextBlockWithTransaction, generateRawNextBlock, getAccountBalance,
-    getBlockchain, getMyUnspentTransactionOutputs, getUnspentTxOuts, sendTransaction
+    getBlockchain, getMyUnspentTransactionOutputs, getUnspentTxOuts, sendTransaction,
 } from './blockchain';
 import {connectToPeers, getSockets, initP2PServer} from './p2p';
 import {getTransactionPool} from './transactionPool';
@@ -11,6 +11,8 @@ import {getPublicFromWallet, initWallet} from './wallet';
 
 const httpPort: number = parseInt(process.env.HTTP_PORT) || 3001;
 const p2pPort: number = parseInt(process.env.P2P_PORT) || 6001;
+
+const peer: string = process.env.PEER || null;
 
 const initHttpServer = (myHttpPort: number) => {
     const app = express();
@@ -119,3 +121,6 @@ const initHttpServer = (myHttpPort: number) => {
 initHttpServer(httpPort);
 initP2PServer(p2pPort);
 initWallet();
+if(peer) {
+    connectToPeers(peer);
+}
