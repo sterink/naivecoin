@@ -3,5 +3,4 @@ npm-debug.log
 .idea
 src/*.js
 src/*.map
-node
 package-lock.json
