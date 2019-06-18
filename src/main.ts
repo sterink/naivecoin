@@ -56,7 +56,7 @@ const initHttpServer = (myHttpPort: number) => {
         res.send({'balance': balance});
     });
 
-    app.get('/unspentOutputs', (req, res) => {
+    app.get('/unspentTransactionOutputs', (req, res) => {
         const outputs = getUnspentOutputs();
         res.send(outputs);
     });
