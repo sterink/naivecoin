@@ -160,6 +160,39 @@ app.post('/mineTransaction', (req, res) => {
 
 如代码所示，使用者只需要提供接收方的地址和交易数量就能通过该api来实现交易。该api调用后为首先进行一次挖矿，获得一笔50个币的原始交易，然后根据接收方地址和交易数量完成指定交易，最终将这些交易记录到新增加的区块中，同时更新我们的「未消费交易outputs」。
 
+### 测试体验
+
+- 启动
+
+为了方便测试，本人对package.json中的启动脚本做了些修改， 让我们可以快速的启动两个节点进行测试，而不需要每次启动都输入一堆的参数。
+
+``` shell
+npm run node1
+npm run node 2
+```
+
+同时, 在启动第二个节点时，加入PEER参数，让第二个节点自动和节点1建立P2P连接。
+``` json
+"scripts": {
+    "prestart": "npm run compile",
+    "node1": "HTTP_PORT=3001 P2P_PORT=6001 WALLET=1 npm start ",
+    "node2": "HTTP_PORT=3002 P2P_PORT=6002 WALLET=2 PEER=ws://localhost:6001 npm start ",
+    "start": "node src/main.js",
+    "compile": "tsc"
+  },
+```
+
+最后，通过新加的WALLET参数的支持，我们会为每个节点自动初始化一个钱包，这样我们就更容易观察钱包和交易的行为。
+
+- 提供额外的查看「未消费交易outputs」接口
+因为「未消费交易outputs」这个清单是非常重要的，这时我们进行交易的基础。所以很有必要提供一个额外的接口来查看里面的数据的变化。你可以通过GET的方式发送请求到 "http://localhost:3001/unspentOutputs" 接口来获得该清单。
+
+注意，如果你起了两个节点，那么端口使用3001和3002都是可以的。 因为该清单是一个分布式清单，和我们的区块链一样，是全网同步的。
+
+有了这些之后，你就可以方便的通过postman调用相应的接口对钱包和交易功能进行体验了。
+
+
+
 ### 小结
 
 我们刚刚实现了一个未加密的钱包功能以进行简单的交易。虽然这个交易算法(mineTransaction相关的逻辑)中最多只能指定两个接收者outputs(一个是接收者，一个是自己)， 但是我们底层的区块链接口是能支持任意数量的outputs的。比如你可以创建一个inputs是50个币，outputs分别是5，15和30个币的交易， 但你必须手动填充这些数据并调用/mineRawBlock这个接口来达成。
@@ -168,54 +201,7 @@ app.post('/mineTransaction', (req, res) => {
 
 本章节完整的代码请看[这里](https://github.com/zhubaitian/naivecoin/tree/chapter4)
 
-<<[第五章](https://github.com/zhubaitian/naivecoin/blob/chapter4/README.md)>>
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+《[第五章](https://github.com/zhubaitian/naivecoin/blob/chapter4/README.md)》
 
 
 
