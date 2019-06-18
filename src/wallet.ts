@@ -4,8 +4,15 @@ import * as _ from 'lodash';
 import {getPublicKey, getTransactionId, signTxIn, Transaction, TxIn, TxOut, UnspentTxOut} from './transaction';
 
 const EC = new ec('secp256k1');
-const privateKeyLocation = 'node/wallet/private_key';
+let privateKeyLocation = 'node/wallet/private_key';
 
+const setPrivateKeyLocation = (walletNumber: number) => {
+    if (walletNumber === 1) {
+        privateKeyLocation = 'node/wallet/private_key'
+    } else {
+        privateKeyLocation = 'node/wallet/private_key' + walletNumber;
+    }
+}
 const getPrivateFromWallet = (): string => {
     const buffer = readFileSync(privateKeyLocation, 'utf8');
     return buffer.toString();
@@ -95,5 +102,5 @@ const createTransaction = (receiverAddress: string, amount: number,
     return tx;
 };
 
-export {createTransaction, getPublicFromWallet,
+export {createTransaction, getPublicFromWallet, setPrivateKeyLocation,
     getPrivateFromWallet, getBalance, generatePrivateKey, initWallet};
