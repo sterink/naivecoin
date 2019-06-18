@@ -168,7 +168,7 @@ app.post('/mineTransaction', (req, res) => {
 
 本章节完整的代码请看[这里](https://github.com/zhubaitian/naivecoin/tree/chapter4)
 
-<<[第五章](https://github.com/zhubaitian/naivecoin/edit/chapter5/README.md)>>
+<<[第五章](https://github.com/zhubaitian/naivecoin/blob/chapter4/README.md)>>
 
 
 
