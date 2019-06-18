@@ -2,14 +2,19 @@ import * as  bodyParser from 'body-parser';
 import * as express from 'express';
 
 import {
-    Block, generateNextBlock, generatenextBlockWithTransaction, generateRawNextBlock, getAccountBalance,
-    getBlockchain
+    Block, generateNextBlock, generatenextBlockWithTransaction,  generateRawNextBlock, getAccountBalance,
+    getBlockchain, getUnspentOutputs
 } from './blockchain';
 import {connectToPeers, getSockets, initP2PServer} from './p2p';
-import {initWallet} from './wallet';
+import {initWallet, setPrivateKeyLocation} from './wallet';
 
 const httpPort: number = parseInt(process.env.HTTP_PORT) || 3001;
 const p2pPort: number = parseInt(process.env.P2P_PORT) || 6001;
+
+const peer: string = process.env.PEER || null;
+
+const walletNumber: number = parseInt(process.env.WALLET) || 1;
+setPrivateKeyLocation(walletNumber);
 
 const initHttpServer = (myHttpPort: number) => {
     const app = express();
@@ -51,6 +56,11 @@ const initHttpServer = (myHttpPort: number) => {
         res.send({'balance': balance});
     });
 
+    app.get('/unspentOutputs', (req, res) => {
+        const outputs = getUnspentOutputs();
+        res.send(outputs);
+    });
+
     app.post('/mineTransaction', (req, res) => {
         const address = req.body.address;
         const amount = req.body.amount;
@@ -79,3 +89,6 @@ const initHttpServer = (myHttpPort: number) => {
 initHttpServer(httpPort);
 initP2PServer(p2pPort);
 initWallet();
+if(peer) {
+    connectToPeers(peer);
+}
