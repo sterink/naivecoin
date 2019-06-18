@@ -117,6 +117,10 @@ const getAccountBalance = (): number => {
     return getBalance(getPublicFromWallet(), unspentTxOuts);
 };
 
+const getUnspentOutputs = (): Object => {
+    return unspentTxOuts;
+};
+
 const calculateHashForBlock = (block: Block): string =>
     calculateHash(block.index, block.previousHash, block.timestamp, block.data, block.difficulty, block.nonce);
 
@@ -233,7 +237,7 @@ const replaceChain = (newBlocks: Block[]) => {
 };
 
 export {
-    Block, getBlockchain, getLatestBlock,
+    Block, getBlockchain, getLatestBlock,getUnspentOutputs,
     generateRawNextBlock, generateNextBlock, generatenextBlockWithTransaction,
     getAccountBalance, isValidBlockStructure, replaceChain, addBlockToChain
 };
