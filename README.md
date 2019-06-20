@@ -85,10 +85,53 @@ case MessageType.RESPONSE_TRANSACTION_POOL:
 
 ### 未决交易有效性验证
 
+因为广播过来的未决交易数据是不可预知的，我们必须对这些号称是未决交易的数据进行有效性验证。我们此前实现的对交易的有效性检查依然会用上， 比如检查数据格式必须正确，交易的inputs，outputs和签名必须一致(即此前章节描述的validateTxIn函数，简单来说就是对每个交易中的每个input，用交易指向的来源output中的地址作为公钥，对input的签名进行解密，并检查和交易id是否一样，以验证input中引用的交易来源确实是属于用户所有。因为只有该公钥是该用户的才能正确解密本次交易的签名， 这就证明了来源交易的拥有者确实就是本次交易的发起者了)。
 
+``` typescript
+const validateTxIn = (txIn: TxIn, transaction: Transaction, aUnspentTxOuts: UnspentTxOut[]): boolean => {
+    const referencedUTxOut: UnspentTxOut =
+        aUnspentTxOuts.find((uTxO) => uTxO.txOutId === txIn.txOutId && uTxO.txOutIndex === txIn.txOutIndex);
+    if (referencedUTxOut == null) {
+        console.log('referenced txOut not found: ' + JSON.stringify(txIn));
+        return false;
+    }
+    const address = referencedUTxOut.address;
 
+    const key = ec.keyFromPublic(address, 'hex');
+    const validSignature: boolean = key.verify(transaction.id, txIn.signature);
+    if (!validSignature) {
+        console.log('invalid txIn signature: %s txId: %s address: %s', txIn.signature, transaction.id, referencedUTxOut.address);
+        return false;
+    }
+    return true;
+};
 
+```
 
+除了以上已有规则外，我们还需要增加一条新规：如果一笔交易中的任何一个用来引用交易货币来源的input在当前的未决交易池中已经存在了，那么该交易将会被视为无效交易，不会纳入到交易池中去。
+
+``` typescript
+const isValidTxForPool = (tx: Transaction, aTtransactionPool: Transaction[]): boolean => {
+    const txPoolIns: TxIn[] = getTxPoolIns(aTtransactionPool);
+
+    const containsTxIn = (txIns: TxIn[], txIn: TxIn) => {
+        return _.find(txPoolIns, (txPoolIn => {
+            return txIn.txOutIndex === txPoolIn.txOutIndex && txIn.txOutId === txPoolIn.txOutId;
+        }))
+    };
+
+    for (const txIn of tx.txIns) {
+        if (containsTxIn(txPoolIns, txIn)) {
+            console.log('txIn already found in the txPool');
+            return false;
+        }
+    }
+    return true;
+};
+```
+这里没有显式定义将未决交易从交易池中移除的操作，当前做法是，每次网络中产生一个新区块时，将会同时去更新交易池。
+
+### 将交易池挖到区块链中去
 
 
 
