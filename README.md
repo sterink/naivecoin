@@ -174,14 +174,14 @@ const updateTransactionPool = (unspentTxOuts: UnspentTxOut[]) => {
 
 ### 体验
 
-- 启动两个节点(建议在两个命令行终端下)
+#### 启动两个节点(建议在两个命令行终端下)
 
 ``` shell
 npm run node1
 npm run node2
 ```
 
-- 查看节点钱包地址
+#### 查看节点钱包地址
 
 通过postman分别发送请求到3001和3002两个端口的/address接入点去获取两个钱包的地址， 比如节点1: GET http://localhost:3001/address
 
@@ -190,7 +190,7 @@ npm run node2
     "address": "04d4d57026bd7b0d951b8d6c72ed9118004cd0929d10f94d7c41b24dbe9d84fa3bb389f2525c05a46bd8d1203b4b3c0e3499f30e5a55f84c573fcccd94c83bc13a"
 }
 ```
-- 挖矿
+#### 挖矿
 
 节点2进行一次挖矿，获得50个币。 POST以下数据到http://localhost:3002/mineBlock 接口:
 
@@ -231,7 +231,7 @@ npm run node2
 }
 ```
 
-- 查看未消费交易outputs
+#### 查看未消费交易outputs
 
 因为全局未消费交易outputs是全网同步的，所以无论哪个节点去查看，结果都是一样的。 这里以节点1为例, Get以下接口: http://localhost:3001/unspentTransactionOutputs
 
@@ -257,7 +257,7 @@ npm run node2
 可以看到节点2挖矿激励所得的id为“46dc195f7d44c2c1687fbd67a9a40263fd508067f89d8c07ee0e14826394b1d5”已经被放到未消费交易outputs中，另外一条交易是系统启动时自动创建原始交易产生的，不用管。
 
 
-- 查看节点自己拥有的未消费outputs
+#### 查看节点自己拥有的未消费outputs
 
 另外为了方便我们体验，系统还一共了另外一个接口来让我们查看对应节点所拥有的未消费outputs。比如我们可以发送 Get 到接口http://localhost:3002/myUnspentTransactionOutputs 去获取节点2的未消费outputs列表。 返回如下
 
@@ -272,7 +272,7 @@ npm run node2
 ]
 ```
 
-- 发起交易
+#### 发起交易
 
 节点2给节点1的钱包发送30个币。 POST以下交易数据到http://localhost:3002/sendTransaction 接口.
 
@@ -283,9 +283,117 @@ npm run node2
 }
 ```
 
+返回如下:
+
+``` json
+{
+    "txIns": [
+        {
+            "txOutId": "46dc195f7d44c2c1687fbd67a9a40263fd508067f89d8c07ee0e14826394b1d5",
+            "txOutIndex": 0,
+            "signature": "30450220130a2d3283337bb3721b992538ba19bbe6561376d0ddc9572595c0af8fb487d502210095d7cfe26717204329e22a386c274ec45d09190f1089fc354ad726ba375d917b"
+        }
+    ],
+    "txOuts": [
+        {
+            "address": "04d4d57026bd7b0d951b8d6c72ed9118004cd0929d10f94d7c41b24dbe9d84fa3bb389f2525c05a46bd8d1203b4b3c0e3499f30e5a55f84c573fcccd94c83bc13a",
+            "amount": 30
+        },
+        {
+            "address": "04bdc45ca144a5e5c8d0b03443f9aedfc8260d4665ac3fd41bd9eb2f06e4dc8228be1e14a4938837cada904cc81fc5747930f480d4d7888b5e82aac6f0581be0df",
+            "amount": 20
+        }
+    ],
+    "id": "a4089fb337943eb80f381f107bdc1583c9b282e6cf735751d976ebd2125c5183"
+}
+```
+
+此时查看区块链和未消费outputs，我们可以看到这笔交易其实还没有被加入到区块链中，也没有被消费掉的。
+
+#### 节点1挖矿并记账
+
+这时如果任何一个节点进行挖矿，就会把节点2发起的交易给记录到新增的区块中去。 比如节点1进行挖矿， POST 以下数据到 http://localhost:3001/mineBlock
+
+``` json
+{
+	"data": "Some data from node1"
+}
+```
+
+从返回记录中可以看到，新增的区块交易记录中，除了有挖矿激励得到的50个币的记录，上面节点2发起的交易记录也被记账到区块中了
+
+``` json
+{
+    "index": 2,
+    "previousHash": "ca7eff56caf46b90cd7230a7c5684e1c201da48b7293aa282efebca2fabf0792",
+    "timestamp": 1561007564,
+    "data": [
+        {
+            "txIns": [
+                {
+                    "signature": "",
+                    "txOutId": "",
+                    "txOutIndex": 2
+                }
+            ],
+            "txOuts": [
+                {
+                    "address": "04d4d57026bd7b0d951b8d6c72ed9118004cd0929d10f94d7c41b24dbe9d84fa3bb389f2525c05a46bd8d1203b4b3c0e3499f30e5a55f84c573fcccd94c83bc13a",
+                    "amount": 50
+                }
+            ],
+            "id": "2e668dcd87fb900f346bab921a8349bc0e39d560c5a07a727cc9484aff471303"
+        },
+        {
+            "txIns": [
+                {
+                    "txOutId": "46dc195f7d44c2c1687fbd67a9a40263fd508067f89d8c07ee0e14826394b1d5",
+                    "txOutIndex": 0,
+                    "signature": "30450220130a2d3283337bb3721b992538ba19bbe6561376d0ddc9572595c0af8fb487d502210095d7cfe26717204329e22a386c274ec45d09190f1089fc354ad726ba375d917b"
+                }
+            ],
+            "txOuts": [
+                {
+                    "address": "04d4d57026bd7b0d951b8d6c72ed9118004cd0929d10f94d7c41b24dbe9d84fa3bb389f2525c05a46bd8d1203b4b3c0e3499f30e5a55f84c573fcccd94c83bc13a",
+                    "amount": 30
+                },
+                {
+                    "address": "04bdc45ca144a5e5c8d0b03443f9aedfc8260d4665ac3fd41bd9eb2f06e4dc8228be1e14a4938837cada904cc81fc5747930f480d4d7888b5e82aac6f0581be0df",
+                    "amount": 20
+                }
+            ],
+            "id": "a4089fb337943eb80f381f107bdc1583c9b282e6cf735751d976ebd2125c5183"
+        }
+    ],
+    "hash": "c245d2d2f9f1ec050b085fd2be39b3cd51e5af6bb53158297276d9b0b17c2b61",
+    "difficulty": 0,
+    "nonce": 0
+}
+```
+
+#### 查看未决交易池
+
+这时我们再查看未决交易池的话，就会发现该交易已经被更新移除掉了
+
+``` json
+[]
+```
 
 
+#### 查看节点2的未决交易outputs
 
+这时如果再查看节点2的未决交易outputs，会发现自己就剩余20个币。
+
+```json
+[
+    {
+        "txOutId": "a4089fb337943eb80f381f107bdc1583c9b282e6cf735751d976ebd2125c5183",
+        "txOutIndex": 1,
+        "address": "04bdc45ca144a5e5c8d0b03443f9aedfc8260d4665ac3fd41bd9eb2f06e4dc8228be1e14a4938837cada904cc81fc5747930f480d4d7888b5e82aac6f0581be0df",
+        "amount": 20
+    }
+]
+```
 
 ### 小结
 
