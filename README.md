@@ -227,7 +227,7 @@ const replaceChain = (newBlocks: Block[]) => {
 
 - 列出所有区块
 - 由用户指定相应内容来创建一个新区块
-- 列出连接过来的节点的websocket url地址
+- 列出连接过来的节点的地址
 - 通过websocket url连接到指定节点
 
 您可以通过Curl工具来对节点进行操作，当然您也可以通过postman等工具来操作：
@@ -263,41 +263,63 @@ npm run node2
 
 > ps： 节点2运行后，即可以通过addPeer这个api和节点1进行websocket连接。
 
+#### 生成一个区块
+```
+curl -H "Content-type:application/json" --data '{"data" : "Some data to the first block"}' http://localhost:3001/mineBlock
+``` 
+返回结果示例:
+
+``` json
+{
+    "index": 1,
+    "previousHash": "816534932c2b7154836da6afc367695e6337db8a921823784c14378abed4f7d7",
+    "timestamp": 1561025398.834,
+    "data": "Some data to the first block",
+    "hash": "979335f8383fa058c0abf5d342a232d345de51ea644756d3522eca5637e97a17"
+}
+```
 #### 获取区块链
 ```
 curl http://localhost:3001/blocks
 ```
 
-#### 生成一个区块
+返回示例:
+
+``` json
+[
+{
+"index": 0,
+"previousHash": "",
+"timestamp": 1465154705,
+"data": "my genesis block!!",
+"hash": "816534932c2b7154836da6afc367695e6337db8a921823784c14378abed4f7d7"
+},
+{
+"index": 1,
+"previousHash": "816534932c2b7154836da6afc367695e6337db8a921823784c14378abed4f7d7",
+"timestamp": 1561025398.834,
+"data": "Some data to the first block",
+"hash": "979335f8383fa058c0abf5d342a232d345de51ea644756d3522eca5637e97a17"
+}
+]
 ```
-curl -H "Content-type:application/json" --data '{"data" : "Some data to the first block"}' http://localhost:3001/mineBlock
-``` 
+
 
 #### 连接到一个节点
 ```
-curl -H "Content-type:application/json" --data '{"peer" : "ws://localhost:6001"}' http://localhost:3001/addPeer
+curl -H "Content-type:application/json" --data '{"peer" : "ws://localhost:6001"}' http://localhost:3002/addPeer
 ```
 #### 查询连接的节点列表
 ```
 curl http://localhost:3001/peers
 ```
 
+返回示例：
+
+``` json
+["::ffff:127.0.0.1:54261"
+```
+
 ### 小结
 到现在为止，我们实现了一个简单的玩具版的区块链。此外，本章节还为我们展示了如何用简单扼要的方法来实现区块链的一些基本原理。下一章节中我们将为naivecoin 中加入工作量证明机制。
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
