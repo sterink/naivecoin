@@ -147,10 +147,38 @@ const generateNextBlock = () => {
 
 ### 更新交易池
 
+一旦挖到一个新区块，我们的未决交易就有可能会随新区块一起被记账到区块链中，该未决交易也就变成已决交易。也就是说，每个新区块携带的交易都可能会导致我们的未决交易池不再有效。 比如以下情况:
 
+- 交易池中的某笔未决交易被记账到新区块中(可能是发起交易的节点自己挖矿时记的，也有可能是其他节点记的)
+- 未决交易中input所指向的交易货币来源，被发起者的其他交易给消费掉了
 
+这些都会导致我们的交易池失效。交易池是失效了，但是，如我们前两章节阐述的，我们还有一份一直保持更新的「未消费交易outpus」清单，所以我们只需用该清单为基石，将交易池中所有的input不存在于「未消费交易outupts」中的项移除掉就行了。代码逻辑来在如下:
 
+``` typescript
+const updateTransactionPool = (unspentTxOuts: UnspentTxOut[]) => {
+    const invalidTxs = [];
+    for (const tx of transactionPool) {
+        for (const txIn of tx.txIns) {
+            if (!hasTxIn(txIn, unspentTxOuts)) {
+                invalidTxs.push(tx);
+                break;
+            }
+        }
+    }
+    if (invalidTxs.length > 0) {
+        console.log('removing the following transactions from txPool: %s', JSON.stringify(invalidTxs));
+        transactionPool = _.without(transactionPool, ...invalidTxs)
+    }
+};
+```
 
+### 小结
+
+通过「未决交易池」机制的引入，我们现在不再需要自己挖矿才能进行一笔交易，其他节点也能帮我们进行记账。但，如前所述，对于帮助我们记账的节点并不会获得任何激励，因为我们的系统中没有去实现交易手续费的功能。
+
+下一个章节我们将会实现一个UI界面来方便大家使用钱包和对区块链进行操作。
+
+[第六章](https://github.com/zhubaitian/naivecoin/tree/chapter6)
 
 
 
