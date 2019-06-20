@@ -35,11 +35,55 @@ app.post('/sendTransaction', (req, res) => {
 
 ### 广播
 
+整个「未决交易】的想法就是将这些交易传播到整个区块链网上，让一些节点最终将其“挖”到区块链中去。为了达成这个目标，我们首先要为这些未决交易的传播建立一些简单的网络规则：
 
+- 当一个节点接收到别人广播出来的交易池时，发现里面有自己此前没有见过的「未决交易】记录时，该节点会将这些没见过的记录加入到自己的交易池中，然后将自己的交易池给广播出去
+- 当一个节点和其他节点建立点对点连接时，会向目标节点请求对方保存的完整交易池记录
 
+类似区块链的广播和同步，我们需要建立两个新的消息类型来为我们未决交易池的广播同步进行服务：**QUERY_TRANSACTION_POOL** 和 **RESPONSE_TRANSACTION_POOL** 。最终我们的消息类型数据结构将如下所示:
 
+``` typescript
+enum MessageType {
+    QUERY_LATEST = 0,
+    QUERY_ALL = 1,
+    RESPONSE_BLOCKCHAIN = 2,
+    QUERY_TRANSACTION_POOL = 3,
+    RESPONSE_TRANSACTION_POOL = 4
+}
+```
 
+交易池广播请求数据最终会通过以下方式进行创建:
 
+``` typescript
+const responseTransactionPoolMsg = (): Message => ({
+    'type': MessageType.RESPONSE_TRANSACTION_POOL,
+    'data': JSON.stringify(getTransactionPool())
+}); 
+
+const queryTransactionPoolMsg = (): Message => ({
+    'type': MessageType.QUERY_TRANSACTION_POOL,
+    'data': null
+});
+```
+
+当节点收到**RESPONSE_TRANSACTION_POOL**这个广播后，我们需要有相应的代码逻辑来因应请求。无论何时我们收到广播过来的未决交易池，我们都会尝试将其加入到我们的本地交易池中去。当然，我们需要对里面的交易做相应的校验。 只有那些我们此前没有见过的交易(不在我们本地保存的那份交易池清单中)，以及有效的交易，我们才会将其纳入到我们的交易池中。紧跟着，如上所述，我们就会将我们的交易池给广播出去，以达到全网同步的效果:
+
+``` typescript
+case MessageType.RESPONSE_TRANSACTION_POOL:
+    const receivedTransactions: Transaction[] = JSONToObject<Transaction[]>(message.data);
+    receivedTransactions.forEach((transaction: Transaction) => {
+        try {
+            handleReceivedTransaction(transaction);
+            //if no error is thrown, transaction was indeed added to the pool
+            //let's broadcast transaction pool
+            broadCastTransactionPool();
+        } catch (e) {
+            //unconfirmed transaction not valid (we probably already have it in our pool)
+        }
+    });
+```
+
+### 未决交易有效性验证
 
 
 
