@@ -199,7 +199,7 @@ npm run node2
 
 本章节代码请查看[这里](https://github.com/zhubaitian/naivecoin/tree/chapter2)
 
-[第三章](https://github.com/zhubaitian/naivecoin/tree/chapter3)
+[第三章](https://github.com/zhubaitian/naivecoin/blob/chapter3/README.md)
 
 
 
