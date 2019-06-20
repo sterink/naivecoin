@@ -172,6 +172,121 @@ const updateTransactionPool = (unspentTxOuts: UnspentTxOut[]) => {
 };
 ```
 
+### 体验
+
+- 启动两个节点(建议在两个命令行终端下)
+
+``` shell
+npm run node1
+npm run node2
+```
+
+- 查看节点钱包地址
+
+通过postman分别发送请求到3001和3002两个端口的/address接入点去获取两个钱包的地址， 比如节点1: GET http://localhost:3001/address
+
+``` json
+{
+    "address": "04d4d57026bd7b0d951b8d6c72ed9118004cd0929d10f94d7c41b24dbe9d84fa3bb389f2525c05a46bd8d1203b4b3c0e3499f30e5a55f84c573fcccd94c83bc13a"
+}
+```
+- 挖矿
+
+节点2进行一次挖矿，获得50个币。 POST以下数据到http://localhost:3002/mineBlock 接口:
+
+``` json
+{
+	"data": "Some data from node2"
+}
+```
+
+返回如下:
+
+``` json
+{
+    "index": 1,
+    "previousHash": "91a73664bc84c0baa1fc75ea6e4aa6d1d20c5df664c724e3159aefc2e1186627",
+    "timestamp": 1561004915,
+    "data": [
+        {
+            "txIns": [
+                {
+                    "signature": "",
+                    "txOutId": "",
+                    "txOutIndex": 1
+                }
+            ],
+            "txOuts": [
+                {
+                    "address": "04bdc45ca144a5e5c8d0b03443f9aedfc8260d4665ac3fd41bd9eb2f06e4dc8228be1e14a4938837cada904cc81fc5747930f480d4d7888b5e82aac6f0581be0df",
+                    "amount": 50
+                }
+            ],
+            "id": "46dc195f7d44c2c1687fbd67a9a40263fd508067f89d8c07ee0e14826394b1d5"
+        }
+    ],
+    "hash": "ca7eff56caf46b90cd7230a7c5684e1c201da48b7293aa282efebca2fabf0792",
+    "difficulty": 0,
+    "nonce": 0
+}
+```
+
+- 查看未消费交易outputs
+
+因为全局未消费交易outputs是全网同步的，所以无论哪个节点去查看，结果都是一样的。 这里以节点1为例, Get以下接口: http://localhost:3001/unspentTransactionOutputs
+
+返回如下:
+
+``` json
+[
+    {
+        "txOutId": "e655f6a5f26dc9b4cac6e46f52336428287759cf81ef5ff10854f69d68f43fa3",
+        "txOutIndex": 0,
+        "address": "04bfcab8722991ae774db48f934ca79cfb7dd991229153b9f732ba5334aafcd8e7266e47076996b55a14bf9913ee3145ce0cfc1372ada8ada74bd287450313534a",
+        "amount": 50
+    },
+    {
+        "txOutId": "46dc195f7d44c2c1687fbd67a9a40263fd508067f89d8c07ee0e14826394b1d5",
+        "txOutIndex": 0,
+        "address": "04bdc45ca144a5e5c8d0b03443f9aedfc8260d4665ac3fd41bd9eb2f06e4dc8228be1e14a4938837cada904cc81fc5747930f480d4d7888b5e82aac6f0581be0df",
+        "amount": 50
+    }
+]
+```
+
+可以看到节点2挖矿激励所得的id为“46dc195f7d44c2c1687fbd67a9a40263fd508067f89d8c07ee0e14826394b1d5”已经被放到未消费交易outputs中，另外一条交易是系统启动时自动创建原始交易产生的，不用管。
+
+
+- 查看节点自己拥有的未消费outputs
+
+另外为了方便我们体验，系统还一共了另外一个接口来让我们查看对应节点所拥有的未消费outputs。比如我们可以发送 Get 到接口http://localhost:3002/myUnspentTransactionOutputs 去获取节点2的未消费outputs列表。 返回如下
+
+``` json
+[
+    {
+        "txOutId": "46dc195f7d44c2c1687fbd67a9a40263fd508067f89d8c07ee0e14826394b1d5",
+        "txOutIndex": 0,
+        "address": "04bdc45ca144a5e5c8d0b03443f9aedfc8260d4665ac3fd41bd9eb2f06e4dc8228be1e14a4938837cada904cc81fc5747930f480d4d7888b5e82aac6f0581be0df",
+        "amount": 50
+    }
+]
+```
+
+- 发起交易
+
+节点2给节点1的钱包发送30个币。 POST以下交易数据到http://localhost:3002/sendTransaction 接口.
+
+``` json
+{
+	"address": "04d4d57026bd7b0d951b8d6c72ed9118004cd0929d10f94d7c41b24dbe9d84fa3bb389f2525c05a46bd8d1203b4b3c0e3499f30e5a55f84c573fcccd94c83bc13a",
+	"amount": 30
+}
+```
+
+
+
+
+
 ### 小结
 
 通过「未决交易池」机制的引入，我们现在不再需要自己挖矿才能进行一笔交易，其他节点也能帮我们进行记账。但，如前所述，对于帮助我们记账的节点并不会获得任何激励，因为我们的系统中没有去实现交易手续费的功能。
