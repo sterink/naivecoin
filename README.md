@@ -323,7 +323,7 @@ const validateCoinbaseTx = (transaction: Transaction, blockIndex: number): boole
 
 本章节完整代码请查看[这里](https://github.com/zhubaitian/naivecoin/tree/chapter3)
 
-[第四章](https://github.com/zhubaitian/naivecoin/tree/chapter4)
+[第四章](https://github.com/zhubaitian/naivecoin/blob/chapter4/README.md)
 
 
 
