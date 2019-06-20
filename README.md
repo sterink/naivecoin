@@ -339,6 +339,6 @@ curl http://localhost:3001/peers
 
 本章节的代码请查看[这里](https://github.com/zhubaitian/naivecoin/tree/chapter1)
 
-[第二章](https://github.com/zhubaitian/naivecoin/tree/chapter2)
+[第二章](https://github.com/zhubaitian/naivecoin/blob/chapter2/README.md)
 
 
