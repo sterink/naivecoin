@@ -131,7 +131,21 @@ const isValidTxForPool = (tx: Transaction, aTtransactionPool: Transaction[]): bo
 ```
 这里没有显式定义将未决交易从交易池中移除的操作，当前做法是，每次网络中产生一个新区块时，将会同时去更新交易池。
 
-### 将交易池挖到区块链中去
+### 记账 - 将交易池挖/记录到区块链中去
+
+接下来我们要实现相应的逻辑，让一个节点将未决交易池记录到其新挖到的一个区块中去(正常情况下，帮忙记账的节点应该会收到奖励的，但是我们这里并没这样实现)。整个逻辑很简单：当一个节点挖到一个区块时，随即会将挖矿得到的原始交易和我们的交易池一并打包放到新挖出来的区块中去。
+
+``` typescript
+const generateNextBlock = () => {
+    const coinbaseTx: Transaction = getCoinbaseTransaction(getPublicFromWallet(), getLatestBlock().index + 1);
+    const blockData: Transaction[] = [coinbaseTx].concat(getTransactionPool());
+    return generateRawNextBlock(blockData);
+};
+```
+
+因为该交易池在此前接受到RESPONSE_TRANSACTION_POOL广播时已经做了验证，所以我们这里不需要进行任何有效性验证的工作。
+
+### 更新交易池
 
 
 
