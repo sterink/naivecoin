@@ -410,7 +410,7 @@ npm run node2
 
 下一个章节我们将会实现一个UI界面来方便大家使用钱包和对区块链进行操作。
 
-[第六章](https://github.com/zhubaitian/naivecoin/tree/chapter6)
+[第六章](https://github.com/zhubaitian/naivecoin/blob/chapter6/README.md)
 
 
 
