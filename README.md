@@ -1,4 +1,4 @@
-# 第五章 钱包
+# 第四章 钱包
 
 - [概览](#概览)
 - [生成钱包](#生成钱包)
@@ -212,7 +212,7 @@ npm run node 2
 
 本章节完整的代码请看[这里](https://github.com/zhubaitian/naivecoin/tree/chapter4)
 
-《[第五章](https://github.com/zhubaitian/naivecoin/blob/chapter4/README.md)》
+[第五章](https://github.com/zhubaitian/naivecoin/blob/chapter4/README.md)
 
 
 
