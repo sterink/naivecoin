@@ -1,52 +1,19 @@
-# Naivecoin
+# 简介
 
-通过1500行代码演示如何实现区块链和比特币，英文原版教程: https://lhartikk.github.io/
+本教程将带领大家从零开始开发一套可行的加密货币系统。开发的基本原则是尽量的简单易懂。
 
-```
-npm install
-npm start
-```
+我们打造的这个项目的名称叫做Naivecoin。 用的开发语言是Typescript。总共分为六个章节。
 
-##### Get blockchain
-```
-curl http://localhost:3001/blocks
-```
+如果你只是对区块链的实现原理感兴趣，那么你只需要看第一章就足够了，代码相当的简单，只用200行的代码就能让你一窥区块链的全貌。
 
-##### Mine a block
-```
-curl -X POST http://localhost:3001/mineBlock
-``` 
+### [第一章:最小可行区块链](https://github.com/zhubaitian/naivecoin/blob/chapter1/README.md)
 
-##### Send transaction
-```
-curl -H "Content-type: application/json" --data '{"address": "04bfcab8722991ae774db48f934ca79cfb7dd991229153b9f732ba5334aafcd8e7266e47076996b55a14bf9913ee3145ce0cfc1372ada8ada74bd287450313534b", "amount" : 35}' http://localhost:3001/sendTransaction
-```
+### [第二章 工作量证明和挖矿](https://github.com/zhubaitian/naivecoin/blob/chapter2/README.md)
 
-##### Query transaction pool
-```
-curl http://localhost:3001/transactionPool
-```
+### [第三章 交易](https://github.com/zhubaitian/naivecoin/blob/chapter3/README.md)
 
-##### Mine transaction
-```
-curl -H "Content-type: application/json" --data '{"address": "04bfcab8722991ae774db48f934ca79cfb7dd991229153b9f732ba5334aafcd8e7266e47076996b55a14bf9913ee3145ce0cfc1372ada8ada74bd287450313534b", "amount" : 35}' http://localhost:3001/mineTransaction
-```
+### [第四章 钱包](https://github.com/zhubaitian/naivecoin/blob/chapter4/README.md)
 
-##### Get balance
-```
-curl http://localhost:3001/balance
-```
+### [第五章 交易中继](https://github.com/zhubaitian/naivecoin/blob/chapter5/README.md)
 
-#### Query information about a specific address
-```
-curl http://localhost:3001/address/04f72a4541275aeb4344a8b049bfe2734b49fe25c08d56918f033507b96a61f9e3c330c4fcd46d0854a712dc878b9c280abe90c788c47497e06df78b25bf60ae64
-```
-
-##### Add peer
-```
-curl -H "Content-type:application/json" --data '{"peer" : "ws://localhost:6001"}' http://localhost:3001/addPeer
-```
-#### Query connected peers
-```
-curl http://localhost:3001/peers
-```
+### [第六章 钱包管理界面和区块链浏览器](https://github.com/zhubaitian/naivecoin/blob/chapter6/README.md)
