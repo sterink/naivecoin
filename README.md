@@ -1,5 +1,6 @@
 >200行代码实现一个最小化可工作区块链，1500行代码实现一个加密货币网络系统。如果这次你还不能理解区块链是怎么回事的话，你打我！如果理解了，你打赏我，右上方给我打个星，Star一下以示鼓励!
 
+作者针对原开源实现 https://github.com/lhartikk/naivecoin 做了一些补充，方便理解。
 # 简介
 
 本教程将带领大家从零开始开发一套可行的加密货币系统。开发的基本原则就是尽量的简单易懂。
@@ -25,3 +26,49 @@
 
 ### [第六章 钱包管理界面和区块链浏览器](https://github.com/zhubaitian/naivecoin/blob/chapter6/README.md)
 本章节我们将为我们的区块链实现一个钱包管理界面和一个区块链浏览器。
+
+
+
+##### Get blockchain
+```
+curl http://localhost:3001/blocks
+```
+
+##### Mine a block
+```
+curl -X POST http://localhost:3001/mineBlock
+``` 
+
+##### Send transaction
+```
+curl -H "Content-type: application/json" --data '{"address": "04bfcab8722991ae774db48f934ca79cfb7dd991229153b9f732ba5334aafcd8e7266e47076996b55a14bf9913ee3145ce0cfc1372ada8ada74bd287450313534b", "amount" : 35}' http://localhost:3001/sendTransaction
+```
+
+##### Query transaction pool
+```
+curl http://localhost:3001/transactionPool
+```
+
+##### Mine transaction
+```
+curl -H "Content-type: application/json" --data '{"address": "04bfcab8722991ae774db48f934ca79cfb7dd991229153b9f732ba5334aafcd8e7266e47076996b55a14bf9913ee3145ce0cfc1372ada8ada74bd287450313534b", "amount" : 35}' http://localhost:3001/mineTransaction
+```
+
+##### Get balance
+```
+curl http://localhost:3001/balance
+```
+
+#### Query information about a specific address
+```
+curl http://localhost:3001/address/04f72a4541275aeb4344a8b049bfe2734b49fe25c08d56918f033507b96a61f9e3c330c4fcd46d0854a712dc878b9c280abe90c788c47497e06df78b25bf60ae64
+```
+
+##### Add peer
+```
+curl -H "Content-type:application/json" --data '{"peer" : "ws://localhost:6001"}' http://localhost:3001/addPeer
+```
+#### Query connected peers
+```
+curl http://localhost:3001/peers
+```
