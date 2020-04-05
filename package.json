@@ -4,20 +4,22 @@
   "description": "",
   "scripts": {
     "prestart": "npm run compile",
+    "node1": "HTTP_PORT=3001 P2P_PORT=6001 WALLET=1 npm start ",
+    "node2": "HTTP_PORT=3002 P2P_PORT=6002 WALLET=2 PEER=ws://localhost:6001 npm start ",
     "start": "node src/main.js",
     "compile": "tsc"
   },
   "dependencies": {
-    "axios": "^0.16.2",
-    "body-parser": "^1.15.2",
+    "axios": "^0.19.2",
+    "body-parser": "^1.19.0",
     "cross-env": "^5.0.1",
     "crypto-js": "^3.1.6",
     "elliptic": "^6.4.0",
-    "express": "~4.11.1",
-    "lodash": "^4.17.4",
+    "express": "^4.17.1",
+    "lodash": "^4.17.15",
     "ts-node": "^3.2.0",
     "typescript": "^2.4.1",
-    "ws": "^3.0.0"
+    "ws": "^3.3.3"
   },
   "engines": {
     "node": ">=8.5.0"
